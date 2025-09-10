@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, Settings, Calendar, TrendingUp, TrendingDown, PieChart, Search, Download, ChevronDown, ChevronUp, Eye, EyeOff, Edit2, AlertTriangle, Save, Upload, X } from 'lucide-react';
+import DeleteAllConfirm from './components/DeleteAllConfirm';
+import NavigationTab from './components/NavigationTab';
 
 const ExpenseTracker = () => {
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('activeTab') || 'transactions');
@@ -22,6 +24,7 @@ const ExpenseTracker = () => {
     const saved = localStorage.getItem('collapsedAccounts');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
+  
   // Add state for collapsed categories
   const [collapsedCategories, setCollapsedCategories] = useState({});
 
@@ -852,54 +855,13 @@ const handleImportCSV = (event) => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="flex">
-          <button
-            onClick={() => setActiveTab('transactions')}
-            className={`flex-1 py-3 px-4 font-medium ${
-              activeTab === 'transactions' 
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            <Calendar className="w-4 h-4 inline mr-2" />
-            Transactions
-          </button>
-          <button
-            onClick={() => setActiveTab('accounts')}
-            className={`flex-1 py-3 px-4 font-medium ${
-              activeTab === 'accounts' 
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            <PieChart className="w-4 h-4 inline mr-2" />
-            Accounts
-          </button>
-          <button
-            onClick={() => setActiveTab('summary')}
-            className={`flex-1 py-3 px-4 font-medium ${
-              activeTab === 'summary' 
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            <TrendingUp className="w-4 h-4 inline mr-2" />
-            Summary
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex-1 py-3 px-4 font-medium ${
-              activeTab === 'settings' 
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            <Settings className="w-4 h-4 inline mr-2" />
-            Settings
-          </button>
-        </div>
-      </div>
+      <NavigationTab 
+        activeTab={activeTab}
+        onTransactions={() => setActiveTab('transactions')}
+        onAccounts={() => setActiveTab('accounts')}
+        onSummary={() => setActiveTab('summary')}
+        onSettings={() => setActiveTab('settings')}
+      />
 
       <div className="p-4">
         {/* Transactions Tab */}
@@ -1507,31 +1469,10 @@ const handleImportCSV = (event) => {
             </div>
 
             {showDeleteAllConfirm && (
-              <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                  <div className="flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-8 h-8 text-red-600 mr-2" />
-                    <h3 className="text-lg font-semibold text-red-600">Confirm Delete All Transactions</h3>
-                  </div>
-                  <p className="text-gray-600 mb-6 text-center">
-                    Are you sure you want to delete all transactions? This action cannot be undone.
-                  </p>
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => setShowDeleteAllConfirm(false)}
-                      className="flex-1 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={deleteAllTransactions}
-                      className="flex-1 py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                    >
-                      Delete All
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <DeleteAllConfirm
+                onCancel={() => setShowDeleteAllConfirm(false)}
+                onDeleteAll={deleteAllTransactions}
+              />
             )}
             
             <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
